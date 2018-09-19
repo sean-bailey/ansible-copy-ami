@@ -1,0 +1,61 @@
+---
+#So marketplace images can't be copied to another account. However, they can be
+#imaged on to a machine and THAT MACHINE can be imaged, and THAT ami can be copied
+# and properly encrypted.
+
+- name:                  Go through all steps to "copy" a marketplace AMI.
+  hosts:                 localhost
+  connection:            local
+  tasks:
+    - name:               create the EC2 Key
+      ec2_key:
+        name: "{{keypair_name}}"
+        region: "{{ sourceRegion }}"
+      register: ec2_key_results
+    - name:              Create the ec2 instance specified from the AMI.
+      ec2:
+        key_name: "{{keypair_name}}"
+        instance_type: t2.micro
+        image: "{{ ami }}"
+        wait: yes
+        region: "{{ sourceRegion }}"
+        assign_public_ip: no
+      register: ec2
+    - name:              Stop the ec2 instance
+      ec2:
+        instance_ids: "{{ec2.instance_ids}}"
+        region: "{{ sourceRegion }}"
+        state: stopped
+        wait: True
+        assign_public_ip: no
+    - name:              Create an ami from that EC2 Instance
+      ec2_ami:
+        instance_id: "{{ec2.instance_ids[0]}}"
+        wait: yes
+        name: "non-encrypted-copy-of-{{ami}}"
+        region: "{{ sourceRegion }}"
+      register: ec2_ami
+    - name:             terminate the ec2 instance
+      ec2:
+        state: 'absent'
+        instance_ids: "{{ ec2.instance_ids }}"
+        region: "{{ sourceRegion }}"
+    - name:              Delete the Keypair created.
+      ec2_key:
+        name: "{{ keypair_name }}"
+        state: absent
+        region: "{{ sourceRegion }}"
+    - name:              copy the given ami to all provided regions with the proper encryption
+      ec2_ami_copy:
+        source_region:   "{{ sourceRegion }}"
+        region:          "{{ destRegion }}"
+        source_image_id: "{{ ec2_ami['image_id'] }}"
+        encrypted:       yes
+        name:            "properly-encrypted-copy-{{ ami }}"
+        kms_key_id:      "{{ kms_arn }}"
+    - name:              clean up the unwanted ami
+      ec2_ami:
+        region: "{{ sourceRegion }}"
+        image_id: "{{ ec2_ami['image_id'] }}"
+        delete_snapshot: True
+        state: absent
