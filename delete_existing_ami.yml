@@ -1,0 +1,13 @@
+---
+#
+
+- name:                  delete existing ami and properly clean up
+  hosts:                 localhost
+  connection:            local
+  tasks:
+  - name:              clean up the unwanted ami
+    ec2_ami:
+      region: "{{ sourceRegion }}"
+      image_id: "{{ ami }}"
+      delete_snapshot: True
+      state: absent

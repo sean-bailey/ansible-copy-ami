@@ -10,3 +10,7 @@ Produces an ami with the name "properly-encrypted-copy-<ami>" which is a copy of
 if you just want to copy an ami to another region, you can use
 
 ansible-playbook copy_ami_to_region.yml -e "ami=`<source ami>` sourceRegion=`<source Region>` destRegion=`<Destination Region>`, kms_arn=`<kms key arn that you wish to encrypt the target ami with>`"
+
+If you need to delete an existing ami you own, you can use
+
+ansible-playbook delete_existing_ami.yml -e "ami=`<target ami>` sourceRegion=`<Target Region>`"
