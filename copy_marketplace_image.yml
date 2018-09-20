@@ -10,8 +10,8 @@
     - name: ensure we are using the Marketplace Ami ID
       ec2_ami_find:
         owner: 'aws-marketplace'
-        ami_id: {{ami}}
-        region: {{sourceRegion}}
+        ami_id: "{{ami}}"
+        region: "{{sourceRegion}}"
       register: ami_find
     - name:               create the EC2 Key
       ec2_key:
