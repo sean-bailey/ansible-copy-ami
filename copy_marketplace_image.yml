@@ -15,12 +15,12 @@
     #  register:          ami_find
     - name:               create the EC2 Key
       ec2_key:
-        name:             "{{keypair_name}}"
+        name:             "{{keypair_name}}--{{ ansible_date_time.iso8601_micro | to_uuid }}"
         region:           "{{ sourceRegion }}"
       register:           ec2_key_results
     - name:               Create the ec2 instance specified from the AMI.
       ec2:
-        key_name:         "{{keypair_name}}"
+        key_name:         "{{ec2_key_results['key']['name']}}"
         instance_type:    t2.micro
         image:            "{{ ami }}"
         wait:             yes
@@ -38,7 +38,7 @@
       ec2_ami:
         instance_id:      "{{ec2.instance_ids[0]}}"
         wait:             yes
-        name:             "non-encrypted-copy-of-{{ami}}"
+        name:             "non-encrypted-copy-of-{{ami}}-{{ ansible_date_time.iso8601_micro | to_uuid }}"
         region:           "{{ sourceRegion }}"
       register:           ec2_ami
     - name:               copy the given ami to all provided regions with the proper encryption
@@ -47,7 +47,7 @@
         region:           "{{ destRegion }}"
         source_image_id:  "{{ ec2_ami['image_id'] }}"
         encrypted:        yes
-        name:             "properly-encrypted-copy-{{ ami }}-{{keypair_name}}"
+        name:             "properly-encrypted-copy-{{ ami }}-{{ ansible_date_time.iso8601_micro | to_uuid }}"
         kms_key_id:       "{{ kms_arn }}"
         wait:             "yes"
     - name:               Delete the Keypair created.
