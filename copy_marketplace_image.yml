@@ -52,7 +52,7 @@
         wait:             "yes"
     - name:               Delete the Keypair created.
       ec2_key:
-        name:             "{{ keypair_name }}"
+        name:             "{{ec2_key_results['key']['name']}}"
         state:            absent
         region:           "{{ sourceRegion }}"
     - name:               terminate the ec2 instance
