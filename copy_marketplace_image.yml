@@ -1,18 +1,9 @@
 ---
-#So marketplace images can't be copied to another account. However, they can be
-#imaged on to a machine and THAT MACHINE can be imaged, and THAT ami can be copied
-# and properly encrypted.
 
 - name:                   Go through all steps to "copy" a marketplace AMI.
   hosts:                  localhost
   connection:             local
   tasks:
-    #- name:              ensure we are using the Marketplace Ami ID
-    #  ec2_ami_find:
-    #    owner:           'aws-marketplace'
-    #    ami_id:          "{{ami}}"
-    #    region:          "{{sourceRegion}}"
-    #  register:          ami_find
     - name:               create the EC2 Key
       ec2_key:
         name:             "{{keypair_name}}--{{ ansible_date_time.iso8601_micro | to_uuid }}"
