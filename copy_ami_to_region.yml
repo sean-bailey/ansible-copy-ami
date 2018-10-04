@@ -6,11 +6,10 @@
   connection:            local
   tasks:
     - name:              copy the given ami to all provided regions with the proper encryption
-      - name:              copy the given ami to all provided regions with the proper encryption
-        ec2_ami_copy:
-          source_region:   "{{ sourceRegion }}"
-          region:          "{{ destRegion }}"
-          source_image_id: "{{ ami }}"
-          encrypted:       yes
-          name:            "properly-encrypted-copy-{{ ami }}"
-          kms_key_id:      "{{ kms_arn }}"
+      ec2_ami_copy:
+        source_region:   "{{ sourceRegion }}"
+        region:          "{{ destRegion }}"
+        source_image_id: "{{ ami }}"
+        encrypted:       yes
+        name:            "properly-encrypted-copy-{{ ami }}"
+        kms_key_id:      "{{ kms_arn }}"
